@@ -70,7 +70,7 @@ int TcpSocket::read (char *data, int maxSize)
 
 int TcpSocket::read (std::string &data, int maxSize)
 {
-	Buffer buffer (maxSize, 0);
+	Buffer buffer (maxSize, '\0');
 	const int res = read (&*buffer.begin (), maxSize);
 	data.assign (buffer.begin(), buffer.begin() + res);
 
