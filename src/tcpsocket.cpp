@@ -31,55 +31,55 @@
 typedef std::vector <char> Buffer;
 
 TcpSocket::TcpSocket ()
-        : port_ (-1), socket_ (io_service_)
+		: port_ (-1), socket_ (io_service_)
 {
 
 }
 
 TcpSocket::TcpSocket (const std::string& host, int port)
-        : host_ (host), port_ (port), socket_ (io_service_)
+		: host_ (host), port_ (port), socket_ (io_service_)
 {
 
 }
 
 TcpSocket::~TcpSocket ()
 {
-    socket_.close();
+	socket_.close();
 }
 
 bool TcpSocket::connect ()
 {
-    try {
-        const boost::asio::ip::tcp::endpoint endpoint (
-            boost::asio::ip::address::from_string (host_),
-            port_);
-        socket_.connect (endpoint);
-    } catch (...) {
-        return false;
-    }
+	try {
+		const boost::asio::ip::tcp::endpoint endpoint (
+			boost::asio::ip::address::from_string (host_),
+			port_);
+		socket_.connect (endpoint);
+	} catch (...) {
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
 int TcpSocket::read (char *data, int maxSize)
 {
 	return socket_.is_open()
-	? socket_.read_some (boost::asio::buffer (data, maxSize))
-	: 0;
+		   ? socket_.read_some (boost::asio::buffer (data, maxSize))
+		   : 0;
 }
 
 int TcpSocket::read (std::string &data, int maxSize)
 {
 	Buffer buffer (maxSize, 0);
-    const int res = read (&*buffer.begin (), maxSize);
+	const int res = read (&*buffer.begin (), maxSize);
 	data.assign (buffer.begin(), buffer.begin() + res);
 
-    return res;
+	return res;
 }
 
 int TcpSocket::write (const char* data, int maxSize)
 {
-    return socket_.write_some (boost::asio::buffer (data, maxSize));
+	return socket_.write_some (boost::asio::buffer (data, maxSize));
 }
 
 

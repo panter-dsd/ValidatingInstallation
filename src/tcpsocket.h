@@ -33,36 +33,41 @@
 
 class TcpSocket
 {
-	
+
 public:
 	TcpSocket ();
 	TcpSocket (const std::string& host, int port);
-	
+
 	~TcpSocket ();
-	
-	std::string host () const
-	{ return host_;}
-	void setHost (const std::string& host)
-	{ host_ = host;}
-	
-	int port () const
-	{ return port_;}
-	void setPort (int port)
-	{ port_ = port;}
-	
+
+	std::string host () const {
+		return host_;
+	}
+	void setHost (const std::string& host) {
+		host_ = host;
+	}
+
+	int port () const {
+		return port_;
+	}
+	void setPort (int port) {
+		port_ = port;
+	}
+
 	bool connect ();
-	
+
 	int read (char *data, int maxSize);
 	int read (std::string &data, int maxSize);
-	
+
 	int write (const char* data, int maxSize);
-	int write (const std::string& str)
-	{ return write (str.c_str (), str.size ());}
-	
+	int write (const std::string& str) {
+		return write (str.c_str (), str.size ());
+	}
+
 private:
 	TcpSocket (const TcpSocket&);
 	TcpSocket& operator= (const TcpSocket&);
-	
+
 private:
 	std::string host_;
 	int port_;
