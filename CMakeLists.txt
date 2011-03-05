@@ -4,7 +4,7 @@ cmake_minimum_required( VERSION 2.6 )
 
 add_definitions(-DUNICODE)
 
-find_package( Boost 1.42.0 COMPONENTS system program_options)
+find_package( Boost 1.36.0 COMPONENTS system program_options)
 
 include_directories(
 	src
@@ -17,6 +17,7 @@ include_directories(
 
 set (src_SRC
 src/main.cpp
+src/servicechecker.cpp
 src/tcpsocket.cpp
 )
 

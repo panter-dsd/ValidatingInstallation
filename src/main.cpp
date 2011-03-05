@@ -25,143 +25,25 @@
  */
 
 #include <iostream>
-#include <string>
 
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
 
-#include "tcpsocket.h"
-
-std::string host;
-int port = -1;
-std::string connectionString;
-std::string connectionAnswer;
-std::string question;
-std::string answer;
-
-enum Errors {
-	NoError = 0,
-	OptionsError,
-	ServiceNotRunning,
-	ProtocolError,
-	ServiceIsWork,
-	ServiceNotWork
-};
-
-bool setVariables (int argc, char **argv);
+#include "abstractchecker.h"
+#include "servicechecker.h"
 
 int main (int argc, char **argv)
 {
-	if (!setVariables (argc, argv)) {
-		return OptionsError;
-	}
-
-	TcpSocket socket (host, port);
-	if (!socket.connect()) {
-		std::cout << "ServiceNotRunning" << std::endl;
-		return ServiceNotRunning;
-	}
-
-	socket.write (connectionString + '\n');
-	std::string str;
-	socket.read (str, 1024);
-	str.resize (str.find ('\n'));
-	if (str != connectionAnswer) {
-		std::cout << "ProtocolError" << std::endl;
-		return ProtocolError;
-	}
+	int result = 0;
 	
-	std::cout << "Connected" << std::endl;
-	
-	socket.write (question + '\n');
-	socket.read (str, 1024);
-	str.resize (str.find ('\n'));
-	if (str != answer) {
-		std::cout << "ServiceIsWork" << std::endl;
-		return ServiceIsWork;
+	AbstractChecker *checker = 0;
+
+	checker = new ServiceChecker ();
+	if (checker->isOpen(argc, argv)) {
+		result = checker->check (argc, argv);
+
+		std::cout << checker->lastError() << std::endl;
 	} else {
-		std::cout << "ServiceNotWork" << std::endl;
-		return ServiceNotWork;
+		std::cout << checker->optionsDescription() << std::endl;
 	}
-
-	return NoError;
-}
-
-bool setVariables (int argc, char** argv)
-{
-	po::options_description optionsDescription ("Allowed options");
-	optionsDescription.add_options()
-	("help", "produce help message")
-	("host", po::value<std::string> (), "set host")
-	("port", po::value<int> (), "set port")
-	("connection_string", po::value<std::string> (), "set connection string")
-	("connection_answer", po::value<std::string> (), "set connections answer")
-	("question", po::value<std::string> (), "set send question")
-	("answer", po::value<std::string> (), "set good answer")
-	;
-
-	try {
-		po::variables_map vm;
-		po::store (po::parse_command_line (argc, argv, optionsDescription), vm);
-		po::notify (vm);
-
-		if (vm.count ("help")) {
-			std::cout << optionsDescription << std::endl;
-			return false;
-		}
-
-		if (vm.count ("host")) {
-			host = vm ["host"].as<std::string>();
-			std::cout << "Host = " << host << ".\n";
-		} else {
-			std::cout << "Host not set.\n";
-			return false;
-		}
-
-		if (vm.count ("port")) {
-			port = vm ["port"].as<int>();
-			std::cout << "Port = " << port << ".\n";
-		} else {
-			std::cout << "Port not set.\n";
-			return false;
-		}
-
-		if (vm.count ("connection_string")) {
-			connectionString = vm ["connection_string"].as<std::string>();
-			std::cout << "Connection string = " << connectionString << ".\n";
-		} else {
-			std::cout << "Connection string not set.\n";
-			return false;
-		}
-
-		if (vm.count ("connection_answer")) {
-			connectionAnswer = vm ["connection_answer"].as<std::string>();
-			std::cout << "Connection answer = " << connectionAnswer << ".\n";
-		} else {
-			std::cout << "Connection answer not set.\n";
-			return false;
-		}
-
-		if (vm.count ("question")) {
-			question = vm ["question"].as<std::string>();
-			std::cout << "Question = " << question << ".\n";
-		} else {
-			std::cout << "Question not set.\n";
-			return false;
-		}
-
-		if (vm.count ("answer")) {
-			answer = vm ["answer"].as<std::string>();
-			std::cout << "Answer = " << answer << ".\n";
-		} else {
-			std::cout << "Answer not set.\n";
-			return false;
-		}
-	} catch (...) {
-		std::cout << "Bad parameters" << std::endl;
-		std::cout << optionsDescription << std::endl;
-		return false;
-	}
-
-	return true;
+	
+	return result;
 }
