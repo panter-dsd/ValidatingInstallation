@@ -19,6 +19,7 @@ set (src_SRC
 src/main.cpp
 src/servicechecker.cpp
 src/tcpsocket.cpp
+src/processchecker.cpp
 )
 
 set (src_HEADERS

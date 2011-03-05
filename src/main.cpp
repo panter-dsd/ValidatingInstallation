@@ -25,24 +25,41 @@
  */
 
 #include <iostream>
-
+#include <vector>
 
 #include "abstractchecker.h"
 #include "servicechecker.h"
+#include "processchecker.h"
+
+typedef std::vector <AbstractChecker*> CheckersCache;
+CheckersCache checkersCache;
+
+AbstractChecker *getChecker (int argc, char **argv)
+{
+
+	for (CheckersCache::const_iterator it = checkersCache.begin(),
+		end = checkersCache.end(); it != end; ++it) {
+		if ((*it)->isOpen(argc, argv)) {
+			return (*it)->clone();
+		}
+	}
+
+	return 0;
+}
 
 int main (int argc, char **argv)
 {
 	int result = 0;
-	
-	AbstractChecker *checker = 0;
 
-	checker = new ServiceChecker ();
-	if (checker->isOpen(argc, argv)) {
+	checkersCache.push_back (new ServiceChecker);
+	checkersCache.push_back (new ProcessChecker);
+	
+	AbstractChecker *checker = getChecker (argc, argv);
+
+	if (checker) {
 		result = checker->check (argc, argv);
 
 		std::cout << checker->lastError() << std::endl;
-	} else {
-		std::cout << checker->optionsDescription() << std::endl;
 	}
 	
 	return result;

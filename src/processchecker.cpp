@@ -25,74 +25,43 @@
 */
 
 
-#ifndef ABSTRACTCHECKER_H
-#define ABSTRACTCHECKER_H
+#include "processchecker.h"
 
-#include <boost/program_options.hpp>
+ProcessChecker::ProcessChecker()
+: AbstractChecker ()
+{
+	optionsDescription_.add_options()
+	("process_name", boost::program_options::value<std::string> (), "set process name")
+	;
+}
 
-class AbstractChecker
+ProcessChecker::~ProcessChecker()
 {
 
-public:
-	enum CheckResult {
-		CommandLineError = -1,
-		NoError = 0,
-		HaveError,
-	};
+}
 
-public:
-	AbstractChecker()
-	{
-		optionsDescription_.add_options()
-		("help", "produce help message")
-		;
-	}
-    virtual ~AbstractChecker()
-	{}
+int ProcessChecker::check_p (int argc, char** argv)
+{
 	
-	AbstractChecker* clone () const {
-		return clone_p ();
-	}
+}
 
-	boost::program_options::options_description optionsDescription () const {
-		return optionsDescription_;
-	}
-	
-	bool isOpen (int argc, char** argv) const {
-		try {
-			boost::program_options::variables_map vm;
-			boost::program_options::store (boost::program_options::parse_command_line (argc, argv, optionsDescription_), vm);
-			boost::program_options::notify (vm);
-		} catch (...) {
+bool ProcessChecker::parse_p (int argc, char** argv)
+{
+	try {
+		boost::program_options::variables_map vm;
+		boost::program_options::store (boost::program_options::parse_command_line (argc, argv, optionsDescription_), vm);
+		boost::program_options::notify (vm);
+		
+		if (vm.count ("process_name")) {
+			processName_ = vm ["process_name"].as<std::string>();
+		} else {
+			errorString_ = "Process name not set.\n";
 			return false;
 		}
-
-		return true;
+	} catch (...) {
+		errorString_ = "Bad parameters";
+		return false;
 	}
 	
-	int check (int argc, char** argv) {
-		if (!parse_p (argc, argv)) {
-			return CommandLineError;
-		}
-		
-		return check_p (argc, argv);
-	}
-	
-	std::string lastError () const {
-		return errorString_;
-	}
-
-private:
-	AbstractChecker(const AbstractChecker& other);
-    AbstractChecker& operator=(const AbstractChecker& other);
-
-	virtual AbstractChecker* clone_p () const = 0;
-	virtual bool parse_p (int argc, char** argv) = 0;
-	virtual int check_p (int argc, char** argv) = 0;
-
-protected:
-	boost::program_options::options_description optionsDescription_;
-	std::string errorString_;
-};
-
-#endif // ABSTRACTCHECKER_H
+	return true;
+}

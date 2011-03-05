@@ -48,10 +48,6 @@ ServiceChecker::~ServiceChecker()
 
 int ServiceChecker::check_p (int argc, char** argv)
 {
-	if (!parse (argc, argv)) {
-		return HaveError;
-	}
-
 	TcpSocket socket (host, port);
 	if (!socket.connect()) {
 		errorString_ = "ServiceNotRunning";
@@ -81,7 +77,7 @@ int ServiceChecker::check_p (int argc, char** argv)
 	return NoError;
 }
 
-bool ServiceChecker::parse (int argc, char** argv)
+bool ServiceChecker::parse_p (int argc, char** argv)
 {
 	try {
 		boost::program_options::variables_map vm;

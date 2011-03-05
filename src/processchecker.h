@@ -25,74 +25,31 @@
 */
 
 
-#ifndef ABSTRACTCHECKER_H
-#define ABSTRACTCHECKER_H
+#ifndef PROCESSCHECKER_H
+#define PROCESSCHECKER_H
 
-#include <boost/program_options.hpp>
+#include "abstractchecker.h"
 
-class AbstractChecker
+
+class ProcessChecker : public AbstractChecker
 {
 
 public:
-	enum CheckResult {
-		CommandLineError = -1,
-		NoError = 0,
-		HaveError,
-	};
-
-public:
-	AbstractChecker()
-	{
-		optionsDescription_.add_options()
-		("help", "produce help message")
-		;
-	}
-    virtual ~AbstractChecker()
-	{}
-	
-	AbstractChecker* clone () const {
-		return clone_p ();
-	}
-
-	boost::program_options::options_description optionsDescription () const {
-		return optionsDescription_;
-	}
-	
-	bool isOpen (int argc, char** argv) const {
-		try {
-			boost::program_options::variables_map vm;
-			boost::program_options::store (boost::program_options::parse_command_line (argc, argv, optionsDescription_), vm);
-			boost::program_options::notify (vm);
-		} catch (...) {
-			return false;
-		}
-
-		return true;
-	}
-	
-	int check (int argc, char** argv) {
-		if (!parse_p (argc, argv)) {
-			return CommandLineError;
-		}
-		
-		return check_p (argc, argv);
-	}
-	
-	std::string lastError () const {
-		return errorString_;
-	}
+	ProcessChecker();
+	virtual ~ProcessChecker();
 
 private:
-	AbstractChecker(const AbstractChecker& other);
-    AbstractChecker& operator=(const AbstractChecker& other);
+	ProcessChecker (const ProcessChecker& other);
+	ProcessChecker& operator= (const ProcessChecker& other);
 
-	virtual AbstractChecker* clone_p () const = 0;
-	virtual bool parse_p (int argc, char** argv) = 0;
-	virtual int check_p (int argc, char** argv) = 0;
+	AbstractChecker* clone_p () const {
+		return new ProcessChecker ();
+	}
+	virtual bool parse_p (int argc, char** argv);
+	virtual int check_p (int argc, char** argv);
 
-protected:
-	boost::program_options::options_description optionsDescription_;
-	std::string errorString_;
+private:
+	std::string processName_;
 };
 
-#endif // ABSTRACTCHECKER_H
+#endif // PROCESSCHECKER_H

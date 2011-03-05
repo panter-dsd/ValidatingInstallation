@@ -30,7 +30,6 @@
 
 #include "abstractchecker.h"
 
-
 class ServiceChecker : public AbstractChecker
 {
 
@@ -42,10 +41,12 @@ private:
 	ServiceChecker (const ServiceChecker& other);
 	ServiceChecker& operator= (const ServiceChecker& other);
 
+	AbstractChecker* clone_p () const {
+		return new ServiceChecker ();
+	}
+	virtual bool parse_p (int argc, char** argv);
 	virtual int check_p (int argc, char** argv);
-
-	bool parse (int argc, char** argv);
-
+	
 private:
 	std::string host;
 	int port;
