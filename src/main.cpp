@@ -34,12 +34,21 @@
 typedef std::vector <AbstractChecker*> CheckersCache;
 CheckersCache checkersCache;
 
+template <class Container>
+void deleteAll (const Container& c)
+{
+	for (CheckersCache::const_iterator it = c.begin(),
+			end = c.end(); it != end; ++it) {
+		delete *it;
+	}
+}
+
 AbstractChecker *getChecker (int argc, char **argv)
 {
 
 	for (CheckersCache::const_iterator it = checkersCache.begin(),
-		end = checkersCache.end(); it != end; ++it) {
-		if ((*it)->isOpen(argc, argv)) {
+			end = checkersCache.end(); it != end; ++it) {
+		if ( (*it)->isOpen (argc, argv)) {
 			return (*it)->clone();
 		}
 	}
@@ -53,7 +62,7 @@ int main (int argc, char **argv)
 
 	checkersCache.push_back (new ServiceChecker);
 	checkersCache.push_back (new ProcessChecker);
-	
+
 	AbstractChecker *checker = getChecker (argc, argv);
 
 	if (checker) {
@@ -61,6 +70,8 @@ int main (int argc, char **argv)
 
 		std::cout << checker->lastError() << std::endl;
 	}
-	
+
+	deleteAll (checkersCache);
+
 	return result;
 }
