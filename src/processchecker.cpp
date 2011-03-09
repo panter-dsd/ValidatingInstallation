@@ -42,7 +42,7 @@ ProcessChecker::~ProcessChecker()
 
 int ProcessChecker::check_p (int argc, char** argv)
 {
-	
+	return NoError;
 }
 
 bool ProcessChecker::parse_p (int argc, char** argv)
